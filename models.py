@@ -38,6 +38,7 @@ class Blog(object):
         post.author_id = post_data["author_id"]
         post.author_name = post_data["author_name"]
         post.source = post_data["source"]
+        post.comments = post_data["comments"]
         return post
 
     def save_post(self, post: 'Post') -> int:
@@ -134,6 +135,7 @@ class Post(object):
         self.author_id = None
         self.author_name = None
         self.source = None
+        self.comments = []
         self.blog = blog
 
     def validate(self):
@@ -159,8 +161,24 @@ class Post(object):
             "title": self.title, "short": self.short, "body": self.body,
             "img": self.img, "tags": self.tags, "category": self.category,
             "draft": self.draft, "datetime": self.datetime, "author_id": self.author_id, "author_name": self.author_name,
-            "source": self.source
+            "source": self.source, "comments": self.comments
         }
+
+    def add_comment(self, comment: str, user_name: str=None, user_id: str=None, user_avatar_url: str=None, ):
+        """ Добавляет новый коммент к статье
+        :param comment:
+        :param user_name:
+        :param user_id:
+        :param user_avatar_url:
+        :return:
+        """
+        comment = {
+            "user_name": user_name, "user_id": user_id, "user_avatar_url": user_avatar_url,
+            "comment": comment, "datetime": datetime.now()
+        }
+        self.comments.append(comment)
+        self.save()
+        return comment
 
 
 class Author(object):

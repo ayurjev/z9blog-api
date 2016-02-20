@@ -116,3 +116,34 @@ class Controller(EnviController):
         """
         blog.create_category(request.get("category_name"), request.get("slug"))
         return {"categories": blog.get_categories()}
+
+    @classmethod
+    @error_format
+    def get_comments(cls, request: Request, *args, **kwargs):
+        """ Возвращает комментарии пользователей к статье
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        post = blog.get_post(int(request.get("post_id")))
+        return {"comments": post.comments}
+
+    @classmethod
+    @error_format
+    def add_comment(cls, request: Request, *args, **kwargs):
+        """ Добавляет новый комментарий к статье
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        post = blog.get_post(int(request.get("post_id")))
+        return {
+            "comment": post.add_comment(
+                request.get("comment"),
+                request.get("user_name", None),
+                request.get("user_id", None),
+                request.get("user_avatar_url", None)
+            )
+        }

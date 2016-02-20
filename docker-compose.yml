@@ -1,6 +1,0 @@
-z9auth:
-  build: .
-  links:
-   - mongo
-mongo:
-  image: mongo
