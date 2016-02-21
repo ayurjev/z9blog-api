@@ -38,7 +38,7 @@ class Blog(object):
         post.author_id = post_data["author_id"]
         post.author_name = post_data["author_name"]
         post.source = post_data["source"]
-        post.comments = post_data["comments"]
+        post.comments = post_data.get("comments") or []
         return post
 
     def save_post(self, post: 'Post') -> int:
