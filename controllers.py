@@ -83,7 +83,7 @@ class Controller(EnviController):
             post = Post()
         post.title = request.get("title")
         post.short = request.get("short")
-        post.img = request.get("img", None)
+        post.imgs = request.get("imgs", [])
         post.body = request.get("body", "")
         post.tags = request.get("tags", [])
         post.category = request.get("category", None)

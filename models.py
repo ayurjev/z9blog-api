@@ -30,7 +30,7 @@ class Blog(object):
         post.title = post_data["title"]
         post.short = post_data["short"]
         post.body = post_data["body"]
-        post.img = post_data["img"]
+        post.imgs = post_data.get("imgs") or []
         post.tags = post_data["tags"]
         post.category = post_data["category"]
         post.draft = post_data["draft"]
@@ -127,7 +127,7 @@ class Post(object):
         self.title = None
         self.short = None
         self.body = None
-        self.img = None
+        self.imgs = []
         self.tags = []
         self.category = None
         self.draft = True
@@ -159,7 +159,7 @@ class Post(object):
         return {
             "_id": self.id, "id": self.id,
             "title": self.title, "short": self.short, "body": self.body,
-            "img": self.img, "tags": self.tags, "category": self.category,
+            "imgs": self.imgs, "tags": self.tags, "category": self.category,
             "draft": self.draft, "datetime": self.datetime, "author_id": self.author_id, "author_name": self.author_name,
             "source": self.source, "comments": self.comments
         }
