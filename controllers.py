@@ -43,7 +43,8 @@ class Controller(EnviController):
                 request.get("category", False),
                 request.get("slug", False),
                 request.get("quantity", False),
-                request.get("except", [])
+                request.get("except", []),
+                request.get("skip", 0)
             )
         }
 

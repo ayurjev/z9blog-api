@@ -13,7 +13,7 @@ from pymongo.errors import DuplicateKeyError
 class Blog(object):
     """ Модель для работы с блогом """
     def __init__(self):
-        self.client = MongoClient('mongo', 27017)
+        self.client = MongoClient('mongo', 27017, connect=False)
         self.posts = self.client.db.posts
         self.categories = self.client.db.categories
 
@@ -60,44 +60,32 @@ class Blog(object):
         result = self.posts.delete_one({"_id": int(post_id)})
         return result.deleted_count == 1
 
-    def get_posts(self, category: str=None, slug: str=None, quantity: int=None, except_ids: list=None):
+    def get_posts(self, category: str=None, slug: str=None, quantity: int=None, except_ids: list=None, skip=None):
         """ Возвращает записи блога из указанных категорий в указанном количестве
         :param category:
         :param slug:
         :param quantity:
         :param except_ids:
+        :param skip:
         :return:
         """
         if not category and slug:
-            category = self.categories.find_one({"_id": slug}).get("name")
-        params = {}
+            category = self.categories.find_one({"_id": slug}).get("id")
+
+        params = {"draft": False}
         if category:
             params["category"] = category
         if except_ids:
             params["_id"] = {"$nin": except_ids}
         return list(
-            self.posts.find(params, {"body": False}).sort([("_id", DESCENDING)]).limit(quantity or 10)
+            self.posts.find(params, {"body": False}).sort([("_id", DESCENDING)]).limit(quantity or 10).skip(skip or 0)
         )
 
     def get_categories(self):
         """ Возвращает список рубрик блога
         :return:
         """
-        return [{"slug": c.get("_id"), "name": c.get("name")} for c in self.categories.find({})]
-
-    def create_category(self, category_name: str, slug: str) -> bool:
-        """ Создает новую рубрику в блоге
-        :param category_name:
-        :param slug:
-        :return:
-        """
-        if not category_name:
-            raise NoNameForNewCategory()
-        try:
-            self.categories.insert_one({"_id": slug, "name": category_name})
-            return True
-        except DuplicateKeyError:
-            raise CategoryAlreadyExists()
+        return [{"slug": c.get("_id"), "name": c.get("name"), "id": int(c.get("id"))} for c in self.categories.find({})]
 
     def _insert_inc(self, doc: dict) -> int:
         """ Вставляет новый документ в коллекцию , генерируя инкрементный ключ - привет mongodb...
@@ -159,7 +147,7 @@ class Post(object):
         return {
             "_id": self.id, "id": self.id,
             "title": self.title, "short": self.short, "body": self.body,
-            "imgs": self.imgs, "tags": self.tags, "category": self.category,
+            "imgs": self.imgs, "tags": self.tags, "category": int(self.category),
             "draft": self.draft, "datetime": self.datetime, "author_id": self.author_id, "author_name": self.author_name,
             "source": self.source, "comments": self.comments
         }
